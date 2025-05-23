@@ -50,10 +50,15 @@ def vertical_mass_integration(hus, ps, plev):
         ps.name = "Pa"
         ps.attrs["units"] = "Pa"
         ps.attrs["long_name"] = "Estimated surface pressure"
+    if plev.max() < 1200:
+        plev = plev * 100
+        plev.name = "Pa"
+        plev.attrs["units"] = "Pa"
+        plev.attrs["long_name"] = "Pressure level"
     plev_3d = plev * xr.ones_like(hus)
     ps_3d = ps * xr.ones_like(hus)
     hus_masked = hus.where(plev_3d <= ps_3d)
-    dp = np.gradient(plev.values) * 100.0
+    dp = np.gradient(plev.values) 
     dp = xr.DataArray(dp, coords={"lev": plev}, dims=["lev"])
     dp_3d = dp * xr.ones_like(hus)
     integrand = hus_masked * dp_3d / 9.8
